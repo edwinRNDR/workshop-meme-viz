@@ -17,13 +17,13 @@ class MemePlotter(imageScale: Double = 10.0) {
         set(value) {
             field = value
             positions = loadData(value)
-            kdtree = positions.kdTree()
-            pointIndices = positions.indices.map { Pair(positions[it], it) }.associate { it }
         }
 
     var positions = loadData(positionsFile)
         set(value) {
             field = value
+            kdtree = value.kdTree()
+            pointIndices = positions.indices.map { Pair(positions[it], it) }.associate { it }
             positionInstances.apply {
                 put {
                     for (pos in value) {
