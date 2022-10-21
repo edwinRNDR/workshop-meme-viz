@@ -118,7 +118,17 @@ class MemePlotter(imageScale: Double = 10.0) {
     fun draw(drawer: Drawer, mousePos: Vector2) {
         drawer.isolated {
 
-            val closest = kdtree.findNearest(mousePos)
+            drawer.shadeStyle = style
+            drawer.vertexBufferInstances(
+                listOf(quad),
+                listOf(positionInstances, sizeInstances),
+                DrawPrimitive.TRIANGLE_STRIP,
+                positionInstances.vertexCount
+            )
+
+
+            val cursorPosition = (drawer.view.inversed * mousePos.xy01).div.xy
+            val closest = kdtree.findNearest(cursorPosition)
             closest?.let {
                 val indexOfClosest = pointIndices[closest]
                 if(sizes[indexOfClosest!!] != 0.0) {
@@ -126,6 +136,9 @@ class MemePlotter(imageScale: Double = 10.0) {
                 }
             }
 
+            style.parameter("currentIndex", currentIndex)
+
+            drawer.defaults()
             drawer.writer {
                 box = Rectangle(0.0, 0.0, 400.0, 400.0)
                 newLine()
@@ -134,15 +147,6 @@ class MemePlotter(imageScale: Double = 10.0) {
                     text(it)
                 }
             }
-            style.parameter("currentIndex", currentIndex)
-
-            drawer.shadeStyle = style
-            drawer.vertexBufferInstances(
-                listOf(quad),
-                listOf(positionInstances, sizeInstances),
-                DrawPrimitive.TRIANGLE_STRIP,
-                positionInstances.vertexCount
-            )
         }
     }
 }
