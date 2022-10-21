@@ -17,10 +17,15 @@ data class Meme(
     val imageUrl: String? = null,
     val favorites: Int? = null,
     val views: Int? = null,
-    val about: String? = null,
-)
+    val about: String? = null
+) {
+    fun toList(): List<String> {
+        return listOf(id, name, year.toString())
+    }
+}
 
 fun loadMemes(filename: String): List<Meme> {
     val a = Gson().fromJson(File(filename).readText(), Array<Meme>::class.java)
     return a.toList()
 }
+

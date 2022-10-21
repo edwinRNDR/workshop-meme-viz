@@ -28,7 +28,7 @@ val orxFeatures = setOf<String>(
 //  "orx-integral-image",
 //  "orx-interval-tree",
 //  "orx-jumpflood",
-//  "orx-kdtree",
+    "orx-kdtree",
 //  "orx-keyframer",      
 //  "orx-kinect-v1",
 //  "orx-kotlin-parser",
@@ -55,7 +55,7 @@ val orxFeatures = setOf<String>(
 //  "orx-tensorflow",    
 //  "orx-time-operators",
 //  "orx-timer",
-//  "orx-triangulation",
+    "orx-triangulation",
 //  "orx-video-profiles",
 )
 
@@ -99,7 +99,7 @@ repositories {
 
 dependencies {
 
-//    implementation(libs.jsoup)
+    implementation(libs.jsoup)
     implementation(libs.gson)
     implementation(libs.csv)
 
