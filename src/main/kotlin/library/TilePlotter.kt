@@ -14,7 +14,7 @@ import org.openrndr.shape.map
 import java.io.File
 import java.io.FileReader
 
-class MemePlotter(imageScale: Double = 10.0, val queryRadius: Double = 10.0) {
+class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
     val memeImage = loadImage("datasets/tiles-64.png")
 
     var positionsFile = "datasets/bert-umap.csv"
@@ -53,7 +53,7 @@ class MemePlotter(imageScale: Double = 10.0, val queryRadius: Double = 10.0) {
                 }
             }
         }
-    var colors = positions.map { ColorRGBa.WHITE }
+    var colors = positions.map { ColorRGBa.WHITE.opacify(0.0) }
         set(value) {
             field = value
             colorsInstances.put {
@@ -107,7 +107,7 @@ class MemePlotter(imageScale: Double = 10.0, val queryRadius: Double = 10.0) {
     }, positions.size).also {
         it.put {
             for (j in positions.indices) {
-                write(Vector4(1.0))
+                write(Vector4.ZERO)
             }
         }
     }
@@ -123,12 +123,15 @@ class MemePlotter(imageScale: Double = 10.0, val queryRadius: Double = 10.0) {
             float tx = mod((c_instance * 1.0) / itemsPerRow, 1.0) + va_texCoord0.x/itemsPerRow; 
             float ty = floor(c_instance / itemsPerRow)/itemsPerRow + va_texCoord0.y / itemsPerRow;
             ty = 1.0 - ty;
+           
+            
             x_fill = mix(texture(p_texture, vec2(tx, ty)), vi_color.rgba, vi_color.a);
         """.trimIndent()
 
         parameter("texture", memeImage)
         parameter("tileSize", 64.0)
         parameter("scale", imageScale.coerceAtLeast(1.0))
+        parameter("inRadius", IntArray(1))
     }
 
     var currentIndexes = listOf<Int>()
@@ -142,7 +145,7 @@ class MemePlotter(imageScale: Double = 10.0, val queryRadius: Double = 10.0) {
 
     var plotterChange = Event<List<Meme>>()
 
-    fun draw(drawer: Drawer, mousePos: Vector2) {
+    fun draw(drawer: Drawer, mousePos: Vector2 = Vector2.INFINITY) {
         drawer.isolated {
 
             drawer.shadeStyle = style
@@ -154,13 +157,15 @@ class MemePlotter(imageScale: Double = 10.0, val queryRadius: Double = 10.0) {
             )
 
 
-
-            val cursorPosition = (drawer.view.inversed * mousePos.xy01).div.xy
-            val closest = kdtree.findAllInRadius(cursorPosition, 10.0)
-            closest?.let {
-                val indexOfClosestOnes = pointIndices.filter { closest.contains(it.key) && sizes[it.value] != 0.0 }.map { it.value }
-                currentIndexes = indexOfClosestOnes
+            if(mousePos != Vector2.INFINITY) {
+                val cursorPosition = (drawer.view.inversed * mousePos.xy01).div.xy
+                val closest = kdtree.findAllInRadius(cursorPosition, 10.0)
+                closest?.let {
+                    val indexOfClosestOnes = pointIndices.filter { closest.contains(it.key) && sizes[it.value] != 0.0 }.map { it.value }
+                    currentIndexes = indexOfClosestOnes
+                }
             }
+
 
 
         }

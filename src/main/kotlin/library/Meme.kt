@@ -20,9 +20,24 @@ data class Meme(
     val about: String? = null
 ) {
     fun toList(): List<String> {
-        return listOf(id, name, year.toString())
+        val list = mutableListOf(id, name)
+
+        if(nsfw) { list.add("nsfw") }
+        if(year != null) { list.add(year.toString()) }
+        if(origin != null) { list.add(origin) }
+        if(status != null) { list.add(status) }
+        if(badges != null) { list.add(badges) }
+        if(tags.isNotEmpty()) { list.add(tags.concat()) }
+        if(imageUrl != null) { list.add(imageUrl) }
+        if(favorites != null) { list.add(favorites.toString()) }
+        if(views != null) { list.add(views.toString()) }
+        if(about != null) { list.add(about) }
+
+        return list
     }
 }
+
+fun List<String>.concat() = this.joinToString(", ") { it }.takeWhile { it.isDigit() }
 
 fun loadMemes(filename: String): List<Meme> {
     val a = Gson().fromJson(File(filename).readText(), Array<Meme>::class.java)
