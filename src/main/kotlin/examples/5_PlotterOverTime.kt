@@ -15,7 +15,7 @@ fun main() = application {
     program {
 
         val tp = MemePlotter(12.0, 15.0)
-        val logits = loadLogits("datasets/mood-logits-all.csv")
+        val logits = loadLogits("datasets/attributes/mood-logits.csv")
 
         val prompt = logits["natural"]?: List(tp.memes.size) { 0.0 }
         val positionsOverTime = tp.memes.map { (it.year?:2000).toDouble().coerceAtLeast(2000.0) }.zip(prompt).map {

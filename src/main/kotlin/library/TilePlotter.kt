@@ -17,7 +17,7 @@ import java.io.FileReader
 class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
     val memeImage = loadImage("datasets/tiles-64.png")
 
-    var positionsFile = "datasets/bert-umap.csv"
+    var positionsFile = "datasets/positions/bert-tsne.csv"
         set(value) {
             field = value
             positions = loadData(value)
@@ -25,9 +25,10 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
 
     private fun loadData(file: String): List<Vector2> {
         val frame = Rectangle(0.0, 0.0,1080.0, 1080.0)
-        val pos = csvReader().readAll(File(file)).map {
-            Vector2(it[1].toDouble(), it[2].toDouble())
+        val pos = csvReader().readAllWithHeader(File(file)).map {
+            Vector2(it["0"]!!.toDouble(), it["1"]!!.toDouble())
         }
+        println("number of rows ${pos.size}")
         val mappedPositions = pos.map(pos.bounds, frame)
         pointIndices = mappedPositions.indices.map { Pair(mappedPositions[it], it) }.associate { it }
         kdtree = mappedPositions.kdTree()
@@ -65,7 +66,9 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
 
     var kdtree = positions.kdTree()
     var pointIndices = positions.indices.map { Pair(positions[it], it) }.associate { it }
-    var memes = loadMemes("datasets/memes-all.json")
+    var memes = loadMemes("datasets/memes-all.json").apply {
+        println("number of memes: ${this.size}")
+    }
 
     val quad = vertexBuffer(vertexFormat {
         position(3)
@@ -80,13 +83,12 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
             write(Vector2(0.0, 1.0))
             write(Vector3(1.0, 1.0, 0.0))
             write(Vector2(1.0, 1.0))
-
         }
     }
 
     private val positionInstances = vertexBuffer(vertexFormat {
         attribute("offset", VertexElementType.VECTOR2_FLOAT32)
-    }, positions.size).also {
+    }, memes.size).also {
         it.put {
             for (pos in positions) {
                 write(pos)

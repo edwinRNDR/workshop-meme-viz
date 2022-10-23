@@ -21,7 +21,7 @@ fun main() = application {
     program {
         val tp = MemePlotter(12.0, 15.0)
 
-        tp.positionsFile = "datasets/bert-umap.csv"
+        tp.positionsFile = "datasets/positions/bert-tsne.csv"
 
         extend {
 

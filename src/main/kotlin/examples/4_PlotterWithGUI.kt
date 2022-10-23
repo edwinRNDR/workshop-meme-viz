@@ -9,6 +9,7 @@ import org.openrndr.extra.gui.addTo
 import org.openrndr.extra.parameters.DoubleParameter
 import org.openrndr.extra.parameters.TextParameter
 import org.openrndr.math.Polar
+import org.openrndr.math.Vector2
 import org.openrndr.shape.bounds
 import org.openrndr.shape.map
 import kotlin.math.log
@@ -21,7 +22,7 @@ fun main() = application {
     }
     program {
         val tp = MemePlotter(12.0, 10.0)
-        val logits = loadLogits("datasets/mood-logits-all.csv")
+        val logits = loadLogits("datasets/attributes/mood-logits.csv")
 
         val gui = GUI()
         gui.compartmentsCollapsedByDefault = false
@@ -45,7 +46,8 @@ fun main() = application {
             val logit2 = logits[settings.prompt2]?: List(tp.memes.size) { 0.0 }
 
             val logitsToPoints = logit1.zip(logit2).mapIndexed { index, it ->
-                Polar(360.0 * index / maxLogitValue, it.second + it.first).cartesian
+                //Polar(360.0 * index / maxLogitValue, it.second + it.first).cartesian
+                Vector2(it.first, it.second)
             }
             val bounds = logitsToPoints.bounds
             val points = logitsToPoints.map { it.map(bounds, drawer.bounds)}

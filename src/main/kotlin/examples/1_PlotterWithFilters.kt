@@ -32,7 +32,7 @@ fun main() = application {
             }.opacify(0.8)
         }
 
-        tp.positionsFile = "datasets/mood-tsne.csv"
+        tp.positionsFile = "datasets/positions/mood-tsne.csv"
         tp.sizes = sizes
         tp.colors = colors
 

@@ -17,7 +17,7 @@ fun main() = application {
     program {
         val tp = MemePlotter(12.0, 15.0)
 
-        tp.positionsFile = "datasets/mood-tsne.csv"
+        tp.positionsFile = "datasets/positions/mood-tsne.csv"
 
         var activeMemes = listOf<Meme>()
         tp.plotterChange.listen { newMemes ->

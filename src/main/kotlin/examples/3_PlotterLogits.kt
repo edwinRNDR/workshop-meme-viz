@@ -3,6 +3,7 @@ package examples
 import MemePlotter
 import library.loadLogits
 import org.openrndr.application
+import org.openrndr.extra.camera.Camera2D
 import org.openrndr.math.Vector2
 import org.openrndr.shape.bounds
 import org.openrndr.shape.map
@@ -16,9 +17,10 @@ fun main() = application {
 
         val tp = MemePlotter(12.0, 15.0)
 
-        val logits = loadLogits("datasets/mood-logits-all.csv")
+        val logits = loadLogits("datasets/attributes/prompt-logits.csv")
+        println(logits.keys)
 
-        val logitsToPoints = logits["sexual"]!!.zip(logits["bad"]!!).map {
+        val logitsToPoints = logits["a photograph of a man"]!!.zip(logits["a photograph of a group of people"]!!).map {
             Vector2(it.first, it.second)
         }
         val bounds = logitsToPoints.bounds
@@ -26,6 +28,7 @@ fun main() = application {
 
         tp.positions = points
 
+        extend(Camera2D())
         extend {
             tp.draw(drawer)
         }
