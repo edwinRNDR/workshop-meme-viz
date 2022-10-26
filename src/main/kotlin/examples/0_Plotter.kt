@@ -1,15 +1,8 @@
 package examples
 
 import MemePlotter
-import library.Meme
-import library.loadLogits
+import loadPositions
 import org.openrndr.application
-import org.openrndr.color.ColorRGBa
-import org.openrndr.draw.writer
-import org.openrndr.extra.camera.Camera2D
-import org.openrndr.extra.color.presets.*
-import org.openrndr.math.Vector2
-import org.openrndr.shape.Rectangle
 import org.openrndr.shape.bounds
 import org.openrndr.shape.map
 
@@ -19,9 +12,12 @@ fun main() = application {
         height = 1080
     }
     program {
-        val tp = MemePlotter(12.0, 15.0)
 
-        tp.positionsFile = "datasets/positions/bert-tsne.csv"
+        var positions = loadPositions("datasets/positions/bert-tsne.csv")
+        positions = positions.map(positions.bounds, drawer.bounds)
+
+        val tp = MemePlotter(12.0, 15.0, positions)
+
 
         extend {
 

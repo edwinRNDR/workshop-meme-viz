@@ -2,12 +2,15 @@ package examples
 
 import MemePlotter
 import library.Meme
+import loadPositions
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.writer
 import org.openrndr.extra.camera.Camera2D
 import org.openrndr.extra.color.presets.*
 import org.openrndr.shape.Rectangle
+import org.openrndr.shape.bounds
+import org.openrndr.shape.map
 
 fun main() = application {
     configure {
@@ -15,9 +18,11 @@ fun main() = application {
         height = 1080
     }
     program {
-        val tp = MemePlotter(12.0, 15.0)
+        var positions = loadPositions("datasets/positions/mood-tsne.csv")
+        positions = positions.map(positions.bounds, drawer.bounds)
 
-        tp.positionsFile = "datasets/positions/mood-tsne.csv"
+        val tp = MemePlotter(12.0, 15.0, positions)
+
 
         var activeMemes = listOf<Meme>()
         tp.plotterChange.listen { newMemes ->

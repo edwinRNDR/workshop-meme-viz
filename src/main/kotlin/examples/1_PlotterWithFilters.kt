@@ -2,6 +2,7 @@ package examples
 
 import MemePlotter
 import library.Meme
+import loadPositions
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.writer
@@ -18,7 +19,11 @@ fun main() = application {
         height = 1080
     }
     program {
-        val tp = MemePlotter(12.0, 15.0)
+
+        var positions = loadPositions("datasets/positions/bert-tsne.csv")
+        positions = positions.map(positions.bounds, drawer.bounds)
+
+        val tp = MemePlotter(12.0, 15.0, positions)
 
         val sizes = tp.memes.map { if (it.nsfw) 1.0 else 0.5 }
         val colors = tp.memes.map {
@@ -31,7 +36,6 @@ fun main() = application {
             }.opacify(0.8)
         }
 
-        tp.positionsFile = "datasets/positions/mood-tsne.csv"
         tp.sizes = sizes
         tp.colors = colors
 

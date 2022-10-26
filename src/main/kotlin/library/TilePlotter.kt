@@ -12,40 +12,56 @@ import org.openrndr.shape.Rectangle
 import org.openrndr.shape.bounds
 import org.openrndr.shape.map
 import java.io.File
-import java.io.FileReader
 
-class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
+class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, positions: List<Vector2> = listOf()) {
     val memeImage = loadImage("datasets/tiles-64.png")
+    var memes = loadMemes("datasets/memes-all.json")
 
-    var positionsFile = "datasets/positions/bert-tsne.csv"
-        set(value) {
-            field = value
-            positions = loadData(value)
-        }
-
-    private fun loadData(file: String): List<Vector2> {
-        val frame = Rectangle(0.0, 0.0,1080.0, 1080.0)
-        val pos = csvReader().readAllWithHeader(File(file)).map {
-            Vector2(it["0"]!!.toDouble(), it["1"]!!.toDouble())
-        }
-        println("number of rows ${pos.size}")
-        val mappedPositions = pos.map(pos.bounds, frame)
-        pointIndices = mappedPositions.indices.map { Pair(mappedPositions[it], it) }.associate { it }
-        kdtree = mappedPositions.kdTree()
-
-        return mappedPositions
-    }
-
-    var positions = loadData(positionsFile)
-        set(value) {
-            field = value
-            positionInstances.put {
-                for (pos in value) {
+    private val positionInstances = vertexBuffer(vertexFormat {
+        attribute("offset", VertexElementType.VECTOR2_FLOAT32)
+    }, memes.size).also {
+        if(positions.isNotEmpty()) {
+            it.put {
+                for (pos in positions) {
                     write(pos)
                 }
             }
         }
-    var sizes = positions.map { 1.0 }
+    }
+    private val sizeInstances = vertexBuffer(vertexFormat {
+        attribute("size", VertexElementType.FLOAT32)
+    }, memes.size).also {
+        it.put {
+            for (j in memes.indices) {
+                write(1.0f)
+            }
+        }
+    }
+    private val colorsInstances = vertexBuffer(vertexFormat {
+        attribute("color", VertexElementType.VECTOR4_FLOAT32)
+    }, memes.size).also {
+        it.put {
+            for (j in memes.indices) {
+                write(Vector4.ZERO)
+            }
+        }
+    }
+
+
+    var positions = List(memes.size) {Vector2.ZERO}
+        set(value) {
+            field = value
+            if(positions.isNotEmpty()) {
+                pointIndices = value.indices.map { Pair(value[it], it) }.associate { it }
+                kdtree = value.kdTree()
+                positionInstances.put {
+                    for (pos in value) {
+                        write(pos)
+                    }
+                }
+            }
+        }
+    var sizes = memes.map { 1.0 }
         set(value) {
             field = value
             sizeInstances.put {
@@ -54,7 +70,7 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
                 }
             }
         }
-    var colors = positions.map { ColorRGBa.WHITE.opacify(0.0) }
+    var colors = memes.map { ColorRGBa.WHITE.opacify(0.0) }
         set(value) {
             field = value
             colorsInstances.put {
@@ -66,9 +82,6 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
 
     var kdtree = positions.kdTree()
     var pointIndices = positions.indices.map { Pair(positions[it], it) }.associate { it }
-    var memes = loadMemes("datasets/memes-all.json").apply {
-        println("number of memes: ${this.size}")
-    }
 
     val quad = vertexBuffer(vertexFormat {
         position(3)
@@ -83,34 +96,6 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
             write(Vector2(0.0, 1.0))
             write(Vector3(1.0, 1.0, 0.0))
             write(Vector2(1.0, 1.0))
-        }
-    }
-
-    private val positionInstances = vertexBuffer(vertexFormat {
-        attribute("offset", VertexElementType.VECTOR2_FLOAT32)
-    }, memes.size).also {
-        it.put {
-            for (pos in positions) {
-                write(pos)
-            }
-        }
-    }
-    private val sizeInstances = vertexBuffer(vertexFormat {
-        attribute("size", VertexElementType.FLOAT32)
-    }, positions.size).also {
-        it.put {
-            for (j in positions.indices) {
-                write(1.0f)
-            }
-        }
-    }
-    private val colorsInstances = vertexBuffer(vertexFormat {
-        attribute("color", VertexElementType.VECTOR4_FLOAT32)
-    }, positions.size).also {
-        it.put {
-            for (j in positions.indices) {
-                write(Vector4.ZERO)
-            }
         }
     }
 
@@ -161,11 +146,12 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0) {
 
             if(mousePos != Vector2.INFINITY) {
                 val cursorPosition = (drawer.view.inversed * mousePos.xy01).div.xy
-                val closest = kdtree.findAllInRadius(cursorPosition, 10.0)
-                closest?.let {
+                val closest = kdtree.findAllInRadius(cursorPosition, queryRadius)
+                if(closest.isNotEmpty()) {
                     val indexOfClosestOnes = pointIndices.filter { closest.contains(it.key) && sizes[it.value] != 0.0 }.map { it.value }
                     currentIndexes = indexOfClosestOnes
                 }
+
             }
 
 
