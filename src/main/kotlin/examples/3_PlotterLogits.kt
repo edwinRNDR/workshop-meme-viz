@@ -1,7 +1,7 @@
 package examples
 
 import MemePlotter
-import library.loadLogits
+import library.loadFeatures
 import org.openrndr.application
 import org.openrndr.extra.camera.Camera2D
 import org.openrndr.math.Vector2
@@ -17,7 +17,7 @@ fun main() = application {
 
         val tp = MemePlotter(12.0, 15.0)
 
-        val logits = loadLogits("datasets/attributes/prompt-logits.csv")
+        val logits = loadFeatures("datasets/attributes/prompt-logits.csv")
         println(logits.keys)
 
         val logitsToPoints = logits["a photograph of a man"]!!.zip(logits["a photograph of a group of people"]!!).map {

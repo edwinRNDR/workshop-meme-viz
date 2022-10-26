@@ -19,6 +19,8 @@ data class Meme(
     val views: Int? = null,
     val about: String? = null
 ) {
+    var index: Int = 0
+
     fun toList(): List<String> {
         val list = mutableListOf(id, name)
 
@@ -39,8 +41,10 @@ data class Meme(
 
 fun List<String>.concat() = this.joinToString(", ") { it }.takeWhile { it.isDigit() }
 
+
 fun loadMemes(filename: String): List<Meme> {
     val a = Gson().fromJson(File(filename).readText(), Array<Meme>::class.java)
+    a.forEachIndexed { index, it -> it.index = index }
     return a.toList()
 }
 

@@ -1,7 +1,7 @@
 package examples
 
 import MemePlotter
-import library.loadLogits
+import library.loadFeatures
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.extra.gui.GUI
@@ -22,7 +22,7 @@ fun main() = application {
     }
     program {
         val tp = MemePlotter(12.0, 10.0)
-        val logits = loadLogits("datasets/attributes/mood-logits.csv")
+        val logits = loadFeatures("datasets/attributes/mood-logits.csv")
 
         val gui = GUI()
         gui.compartmentsCollapsedByDefault = false

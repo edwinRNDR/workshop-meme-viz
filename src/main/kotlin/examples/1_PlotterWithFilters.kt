@@ -2,7 +2,6 @@ package examples
 
 import MemePlotter
 import library.Meme
-import library.loadLogits
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.writer

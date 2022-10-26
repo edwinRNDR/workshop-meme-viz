@@ -1,7 +1,7 @@
 package examples
 
 import MemePlotter
-import library.loadLogits
+import library.loadFeatures
 import org.openrndr.application
 import org.openrndr.math.Vector2
 import org.openrndr.shape.bounds
@@ -15,7 +15,7 @@ fun main() = application {
     program {
 
         val tp = MemePlotter(12.0, 15.0)
-        val logits = loadLogits("datasets/attributes/mood-logits.csv")
+        val logits = loadFeatures("datasets/attributes/mood-logits.csv")
 
         val prompt = logits["natural"]?: List(tp.memes.size) { 0.0 }
         val positionsOverTime = tp.memes.map { (it.year?:2000).toDouble().coerceAtLeast(2000.0) }.zip(prompt).map {

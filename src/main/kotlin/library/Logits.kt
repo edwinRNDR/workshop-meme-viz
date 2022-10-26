@@ -2,7 +2,7 @@ package library
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 
-fun loadLogits(filename: String) : Map<String, List<Double>> {
+fun loadFeatures(filename: String) : Map<String, List<Double>> {
     val result = mutableMapOf<String, MutableList<Double>>()
     csvReader().open(filename) {
         this.readAllWithHeaderAsSequence().forEach {
