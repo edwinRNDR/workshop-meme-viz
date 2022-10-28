@@ -1,6 +1,7 @@
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import library.Meme
 import library.loadMemes
+import org.openrndr.MouseEvents
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.events.Event
@@ -16,6 +17,13 @@ import java.io.File
 class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, positions: List<Vector2> = listOf()) {
     val memeImage = loadImage("datasets/tiles-64.png")
     var memes = loadMemes("datasets/memes-all.json")
+
+    var mousePos = Vector2.INFINITY
+    fun setupMouseEvents(mouse: MouseEvents) {
+        mouse.moved.listen {
+            mousePos = it.position
+        }
+    }
 
     private val positionInstances = vertexBuffer(vertexFormat {
         attribute("offset", VertexElementType.VECTOR2_FLOAT32)
@@ -112,7 +120,7 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, pos
             ty = 1.0 - ty;
            
             
-            x_fill = mix(texture(p_texture, vec2(tx, ty)), vi_color.rgba, vi_color.a);
+            x_fill = texture(p_texture, vec2(tx, ty)) *  vi_color.rgba;
         """.trimIndent()
 
         parameter("texture", memeImage)
@@ -132,9 +140,8 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, pos
 
     var plotterChange = Event<List<Meme>>()
 
-    fun draw(drawer: Drawer, mousePos: Vector2 = Vector2.INFINITY) {
+    fun draw(drawer: Drawer) {
         drawer.isolated {
-
             drawer.shadeStyle = style
             drawer.vertexBufferInstances(
                 listOf(quad),
@@ -143,19 +150,15 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, pos
                 positionInstances.vertexCount
             )
 
-
             if(mousePos != Vector2.INFINITY) {
                 val cursorPosition = (drawer.view.inversed * mousePos.xy01).div.xy
                 val closest = kdtree.findAllInRadius(cursorPosition, queryRadius)
-                if(closest.isNotEmpty()) {
-                    val indexOfClosestOnes = pointIndices.filter { closest.contains(it.key) && sizes[it.value] != 0.0 }.map { it.value }
+                if (closest.isNotEmpty()) {
+                    val indexOfClosestOnes =
+                        pointIndices.filter { closest.contains(it.key) && sizes[it.value] != 0.0 }.map { it.value }
                     currentIndexes = indexOfClosestOnes
                 }
-
             }
-
-
-
         }
     }
 }

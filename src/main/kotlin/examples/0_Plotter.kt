@@ -12,7 +12,6 @@ fun main() = application {
         height = 1080
     }
     program {
-
         var positions = loadPositions("datasets/positions/bert-tsne.csv")
         positions = positions.map(positions.bounds, drawer.bounds)
 

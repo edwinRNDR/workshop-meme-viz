@@ -89,20 +89,28 @@ class MemePlotter3D(imageScale: Double = 10.0, var queryRadius: Double = 10.0, p
     }, 4).also {
         it.put {
             write(Vector3(-1.0, -1.0, 0.0))
-            write(Vector2(0.0, 0.0))
-            write(Vector3(1.0, -1.0, 0.0))
-            write(Vector2(1.0, 0.0))
-            write(Vector3(-1.0, 1.0, 0.0))
             write(Vector2(0.0, 1.0))
-            write(Vector3(1.0, 1.0, 0.0))
+            write(Vector3(1.0, -1.0, 0.0))
             write(Vector2(1.0, 1.0))
+            write(Vector3(-1.0, 1.0, 0.0))
+            write(Vector2(0.0, 0.0))
+            write(Vector3(1.0, 1.0, 0.0))
+            write(Vector2(1.0, 0.0))
         }
     }
 
     val style = shadeStyle {
         vertexTransform = """
+            
+            
+            vec3 voffset = (x_viewMatrix * vec4(i_offset, 1.0)).xyz;
+            x_viewMatrix = mat4(1.0, 0.0, 0.0, 0.0, 
+                                0.0, 1.0, 0.0, 0.0, 
+                                0.0, 0.0, 1.0, 0.0, 
+                                0.0, 0.0, 0.0, 1.0);
+
             x_position.xy *= p_scale * i_size;
-            x_position.xy += i_offset.xy;
+            x_position.xyz += voffset;
         """.trimIndent()
 
         fragmentTransform = """
@@ -111,8 +119,10 @@ class MemePlotter3D(imageScale: Double = 10.0, var queryRadius: Double = 10.0, p
             float ty = floor(c_instance / itemsPerRow)/itemsPerRow + va_texCoord0.y / itemsPerRow;
             ty = 1.0 - ty;
            
+           
             
             x_fill = mix(texture(p_texture, vec2(tx, ty)), vi_color.rgba, vi_color.a);
+            if (x_fill.a < 0.9) discard;
         """.trimIndent()
 
         parameter("texture", memeImage)

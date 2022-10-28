@@ -4,7 +4,7 @@ import org.openrndr.math.map
 import kotlin.math.sqrt
 
 
-data class Statistics(val average:Double, val variance:Double, val standardDeviation: Double, val p5:Double, val p95: Double)
+data class Statistics(val sampleCount: Int, val average:Double, val variance:Double, val standardDeviation: Double, val p5:Double, val p95: Double)
 
 
 fun Map<String, List<Double>>.minMaxMappers(): Map<String, (Double)->Double> {
@@ -73,10 +73,11 @@ fun Map<String, List<Double>>.statistics(): Map<String, Statistics> {
     val p5 = this.percentile(0.05)
     val p95 = this.percentile(0.95)
     val standardDeviation = variance.mapValues { sqrt(it.value) }
+    val sampleCount = this.mapValues { it.value.size }
 
     return this.mapValues { (key, value) ->
 
-        Statistics(averarage[key]!!, variance[key]!!, standardDeviation[key]!!, p5[key]!!, p95[key]!!)
+        Statistics(sampleCount[key]!!, averarage[key]!!, variance[key]!!, standardDeviation[key]!!, p5[key]!!, p95[key]!!)
 
     }
 }

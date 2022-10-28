@@ -12,7 +12,7 @@ fun main() = application {
     }
     program {
 
-        var positions = loadPositions("datasets/positions/bert-tsne.csv").map { it.vector3(z = 0.0) }
+        var positions = loadPositions("datasets/positions/bert-tsne.csv").map { it.vector3(z = Math.random()*10.0) }
 
         val tp = MemePlotter3D(5.0, 15.0, positions)
 

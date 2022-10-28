@@ -22,6 +22,7 @@ fun main() = application {
         positions = positions.map(positions.bounds, drawer.bounds)
 
         val tp = MemePlotter(12.0, 15.0, positions)
+        tp.setupMouseEvents(mouse)
 
 
         var activeMemes = listOf<Meme>()
@@ -32,7 +33,7 @@ fun main() = application {
         val camera = Camera2D()
         extend(camera)
         extend {
-            tp.draw(drawer, mouse.position)
+            tp.draw(drawer)
 
             drawer.defaults()
             drawer.writer {
