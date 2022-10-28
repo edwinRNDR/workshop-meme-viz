@@ -50,7 +50,7 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, pos
     }, memes.size).also {
         it.put {
             for (j in memes.indices) {
-                write(Vector4.ZERO)
+                write(ColorRGBa.WHITE)
             }
         }
     }
@@ -78,12 +78,12 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, pos
                 }
             }
         }
-    var colors = memes.map { ColorRGBa.WHITE.opacify(0.0) }
+    var colors = memes.map { ColorRGBa.WHITE }
         set(value) {
             field = value
             colorsInstances.put {
                 for (c in value) {
-                    write(Vector4(c.r, c.g, c.b, c.alpha))
+                    write(c)
                 }
             }
         }

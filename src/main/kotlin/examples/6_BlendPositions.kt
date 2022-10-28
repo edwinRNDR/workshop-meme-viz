@@ -21,18 +21,16 @@ fun main() = application {
         height = 1080
     }
     program {
-        val tp = MemePlotter(12.0)
+        val tp = MemePlotter(10.0)
 
-        val positions1 = loadPositions("datasets/positions/bert-tsne.csv")
-        val positions2 = loadPositions("datasets/positions/mood-tsne.csv")
+        val positions1 = loadPositions("datasets/positions/prompt-grid.csv")
+        val positions2 = loadPositions("datasets/positions/prompt-tsne.csv")
 
         extend {
-
-            val t = sin(seconds * 0.3) * 0.5 + 0.5
+            val t = mouse.position.x / width
             val positions = blendPositions(positions1, positions2, t)
             tp.positions = positions.map(positions.bounds, drawer.bounds)
             tp.draw(drawer)
-
         }
     }
 }
