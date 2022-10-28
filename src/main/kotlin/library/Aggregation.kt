@@ -6,6 +6,36 @@ import kotlin.math.sqrt
 
 data class Statistics(val sampleCount: Int, val average:Double, val variance:Double, val standardDeviation: Double, val p5:Double, val p95: Double)
 
+fun List<Meme>.groupByTag() : Map<String, List<Meme>> {
+
+    val result = mutableMapOf<String, MutableList<Meme>>()
+
+    for (meme in this) {
+        for (tag in meme.tags) {
+            val members = result.getOrPut(tag) { mutableListOf() }
+            members.add(meme)
+        }
+    }
+
+    return result
+}
+
+@JvmName("featureStatisticsStringMeme")
+fun Map<String, List<Meme>>.featureStatistics(features: Map<String, List<Double>>): Map<String, Map<String, Statistics>> {
+    return this.mapValues {
+        val memeIndices = it.value.map { v -> v.index }
+        val featuresGrouped = memeIndices.map { index -> features.row(index) }.transpose()
+        featuresGrouped.statistics()
+    }
+}
+
+fun Map<String?, List<Meme>>.featureStatistics(features: Map<String, List<Double>>): Map<String?, Map<String, Statistics>> {
+    return this.mapValues {
+        val memeIndices = it.value.map { v -> v.index }
+        val featuresGrouped = memeIndices.map { index -> features.row(index) }.transpose()
+        featuresGrouped.statistics()
+    }
+}
 
 fun Map<String, List<Double>>.minMaxMappers(): Map<String, (Double)->Double> {
     val min = this.percentile(0.0)

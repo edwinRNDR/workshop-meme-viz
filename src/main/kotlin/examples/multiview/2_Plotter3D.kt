@@ -15,7 +15,7 @@ fun main() = application {
     program {
         val positions = loadPositions3D("datasets/positions/prompt-umap-spherical.csv").map { it * 30.0 }
         val scatterPlot = MemePlotter3D(5.0, 15.0, positions)
-        val viewBox = ViewBox3D(this, Vector2(0.0, 0.0), width, height) {
+        val viewBox = ViewBox3D(this, Vector2(100.0, 100.0), width - 200, height - 200) {
             drawer.clear(ColorRGBa.PINK)
             scatterPlot.draw(drawer)
         }
