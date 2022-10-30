@@ -152,11 +152,15 @@ class MemePlotter(imageScale: Double = 10.0, var queryRadius: Double = 10.0, pos
 
             if(mousePos != Vector2.INFINITY) {
                 val cursorPosition = (drawer.view.inversed * mousePos.xy01).div.xy
-                val closest = kdtree.findAllInRadius(cursorPosition, queryRadius)
+                val closest = kdtree.findAllInRadius(cursorPosition, queryRadius).sortedBy {
+                    it.distanceTo(cursorPosition)
+                }
                 if (closest.isNotEmpty()) {
                     val indexOfClosestOnes =
                         pointIndices.filter { closest.contains(it.key) && sizes[it.value] != 0.0 }.map { it.value }
                     currentIndexes = indexOfClosestOnes
+                } else {
+                    currentIndexes = emptyList()
                 }
             }
         }
